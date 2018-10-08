@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:map_view/location.dart';
-import 'package:uri/uri.dart';
 import 'map_view.dart';
 import 'locations.dart';
 import 'map_view_type.dart';
@@ -77,11 +76,12 @@ class StaticMapProvider {
 
   Uri _buildUrl(List<Marker> locations, Location center, int zoomLevel,
       int width, int height, StaticMapViewType mapType) {
-    var finalUri = new UriBuilder()
-      ..scheme = 'https'
-      ..host = 'maps.googleapis.com'
-      ..port = 443
-      ..path = '/maps/api/staticmap';
+    var finalUri = Uri(
+      scheme: 'https',
+      host: 'maps.googleapis.com',
+      port: 443,
+      path: '/maps/api/staticmap'
+    );
 
     if (center == null && (locations == null || locations.length == 0)) {
       center = Locations.centerOfUSA;
@@ -89,13 +89,15 @@ class StaticMapProvider {
 
     if (locations == null || locations.length == 0) {
       if (center == null) center = Locations.centerOfUSA;
-      finalUri.queryParameters = {
-        'center': '${center.latitude},${center.longitude}',
-        'zoom': zoomLevel.toString(),
-        'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
-        'maptype': _getMapTypeQueryParam(mapType),
-        'key': googleMapsApiKey,
-      };
+      finalUri = finalUri.replace(
+        queryParameters: {
+          'center': '${center.latitude},${center.longitude}',
+          'zoom': zoomLevel.toString(),
+          'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+          'maptype': _getMapTypeQueryParam(mapType),
+          'key': googleMapsApiKey,
+        }
+      );
     } else {
       List<String> markers = new List();
       locations.forEach((location) {
@@ -105,19 +107,20 @@ class StaticMapProvider {
         markers.add(marker);
       });
       String markersString = markers.join('|');
-      finalUri.queryParameters = {
-        'markers': markersString,
-        'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
-        'maptype': _getMapTypeQueryParam(mapType),
-        'key': googleMapsApiKey,
-      };
+      finalUri = finalUri.replace(
+          queryParameters: {
+            'markers': markersString,
+            'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+            'maptype': _getMapTypeQueryParam(mapType),
+            'key': googleMapsApiKey,
+          }
+      );
     }
     if (center != null)
       finalUri.queryParameters['center'] =
           '${center.latitude},${center.longitude}';
 
-    var uri = finalUri.build();
-    return uri;
+    return finalUri;
   }
 
   String _getMapTypeQueryParam(StaticMapViewType maptype) {
