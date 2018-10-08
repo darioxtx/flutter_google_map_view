@@ -51,10 +51,10 @@ class StaticMapProvider {
   ///
   Uri getStaticUriWithMarkersAndZoom(List<Marker> markers,
       {int width,
-      int height,
-      StaticMapViewType maptype,
-      Location center,
-      int zoomLevel}) {
+        int height,
+        StaticMapViewType maptype,
+        Location center,
+        int zoomLevel}) {
     return _buildUrl(markers, center, zoomLevel, width ?? defaultWidth,
         height ?? defaultHeight, maptype ?? defaultMaptype);
   }
@@ -77,11 +77,13 @@ class StaticMapProvider {
   Uri _buildUrl(List<Marker> locations, Location center, int zoomLevel,
       int width, int height, StaticMapViewType mapType) {
     var finalUri = Uri(
-      scheme: 'https',
-      host: 'maps.googleapis.com',
-      port: 443,
-      path: '/maps/api/staticmap'
+        scheme: 'https',
+        host: 'maps.googleapis.com',
+        port: 443,
+        path: '/maps/api/staticmap'
     );
+
+    Map<String, String> parameters = Map<String, String>();
 
     if (center == null && (locations == null || locations.length == 0)) {
       center = Locations.centerOfUSA;
@@ -89,15 +91,13 @@ class StaticMapProvider {
 
     if (locations == null || locations.length == 0) {
       if (center == null) center = Locations.centerOfUSA;
-      finalUri = finalUri.replace(
-        queryParameters: {
-          'center': '${center.latitude},${center.longitude}',
-          'zoom': zoomLevel.toString(),
-          'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
-          'maptype': _getMapTypeQueryParam(mapType),
-          'key': googleMapsApiKey,
-        }
-      );
+      parameters = {
+        'center': '${center.latitude},${center.longitude}',
+        'zoom': zoomLevel.toString(),
+        'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+        'maptype': _getMapTypeQueryParam(mapType),
+        'key': googleMapsApiKey,
+      };
     } else {
       List<String> markers = new List();
       locations.forEach((location) {
@@ -107,18 +107,24 @@ class StaticMapProvider {
         markers.add(marker);
       });
       String markersString = markers.join('|');
-      finalUri = finalUri.replace(
-          queryParameters: {
-            'markers': markersString,
-            'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
-            'maptype': _getMapTypeQueryParam(mapType),
-            'key': googleMapsApiKey,
-          }
-      );
+      parameters = {
+        'markers': markersString,
+        'size': '${width ?? defaultWidth}x${height ?? defaultHeight}',
+        'maptype': _getMapTypeQueryParam(mapType),
+        'key': googleMapsApiKey,
+      };
     }
-    if (center != null)
-      finalUri.queryParameters['center'] =
-          '${center.latitude},${center.longitude}';
+    if (center != null) {
+      parameters['center'] = '${center.latitude},${center.longitude}';
+    }
+
+    if (zoomLevel != null) {
+      parameters['zoom'] =  zoomLevel.toString();
+    }
+
+    finalUri = finalUri.replace(
+        queryParameters: parameters
+    );
 
     return finalUri;
   }
