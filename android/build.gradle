@@ -2,7 +2,7 @@ group 'com.apptreesoftware.mapview'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.51'
+    ext.kotlin_version = '1.2.71'
     repositories {
         google()
         jcenter()
@@ -25,14 +25,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 27
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -44,6 +44,6 @@ android {
 
 dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50'
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.71'
+    implementation 'com.google.android.gms:play-services-maps:16.0.0'
 }
